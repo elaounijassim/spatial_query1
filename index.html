@@ -1,0 +1,128 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Requete spatiale</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js" crossorigin=""></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.js"></script>
+    <style>
+    body { margin: 0; padding: 0; }
+    #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    </style>
+    <!-- icone -->
+    <link rel="shortcut icon" type="image" href="images/hotel.png" />
+    <!-- Load Esri Leaflet from CDN -->
+    <script src="https://unpkg.com/esri-leaflet@^3.0.8/dist/esri-leaflet.js"></script>
+    <!-- Load Esri Leaflet Vector from CDN -->
+    <script src="https://unpkg.com/esri-leaflet-vector@4.0.0/dist/esri-leaflet-vector.js" crossorigin=""></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.js"></script>
+    <style>
+      html,
+      body,
+      #map {
+        padding: 20px;
+        margin: 10px;
+        height: 500px;
+        width: 1200px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 14px;
+        color: #323232;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>&nbsp;</h2>
+    <h2>&nbsp;</h2>
+    <h2>&nbsp;</h2>
+    <h2>&nbsp;</h2>
+    <h2>&nbsp;</h2>
+    <h2>&nbsp;</h2>
+    <h2>&nbsp;</h2>
+    <h2>&nbsp;</h2>
+    <h2>&nbsp;</h2>
+    <h2>&nbsp;</h2>
+    <h2>&nbsp;</h2>
+    <h2>&nbsp;</h2>
+    <center><h2>Recherche des hotels proches de 1 km</h2></center>
+    <center><p>Veuillez cliquer sur une position sur la carte</p></center>
+    <center><p>Les hotels proches de 1 km vont être sélectionnés</p></center>
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
+ 
+
+</style>
+    <div id="map"></div>
+    <script>
+      const apiKey = "AAPK3f16c9495dc84107ad6e7e5a1378afb5C6hT2uEFfGXeUYBbidHz9kuF2htXvGjl6MaEQB9NJvCjVpCUZ3QQEjL1Kn50oleM";
+
+      const map = L.map("map").setView([34.02, -6.83], 15);
+
+      const tiles = L.tileLayer('https://api.mapbox.com/styles/v1/elaounijassim/claz9neo300li14mpxy0alzzo/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiZWxhb3VuaWphc3NpbSIsImEiOiJjbGF5ZmswaXIwNzhvM3FtbHhiZ2o3eG94In0.2D5g4-DntItXKK1ylEJsrQ', {
+                            maxZoom: 19,
+                            attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>"
+                        }).addTo(map);
+      
+
+      const streetLights = L.esri
+        .featureLayer({
+          url: "https://services7.arcgis.com/2P6vvDuBXUEzsPyf/arcgis/rest/services/hotel/FeatureServer/0",
+          pointToLayer: function (geojson, latlng) {
+            return L.circleMarker(latlng);
+          },
+          style: {
+            color: "#fffff",
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0
+          }
+        })
+        .addTo(map);
+
+      let previousIds = [];
+
+      map.on("click", function (e) {
+        streetLights
+          .query()
+          .nearby(e.latlng, 1000)
+          .ids(function (error, ids) {
+            if (error) {
+              return;
+            }
+
+            for (let j = 0; j < previousIds.length; j++) {
+              streetLights.resetStyle(previousIds[j]);
+            }
+
+            if (!ids) {
+              previousIds = [];
+              return;
+            }
+
+            previousIds = ids;
+
+            for (let i = 0; i < ids.length; i++) {
+              streetLights.setFeatureStyle(ids[i], {
+                color: "#BA454E",
+                weight: 2,
+                opacity: 0.85,
+                fillOpacity: 0.5
+              });
+            }
+          });
+      streetLights.bindPopup(function (layer) {
+      return L.Util.template("Nom: {name} <br>" , layer.feature.properties);
+      })
+      });
+       L.esri
+        .featureLayer({
+          url: "https://services7.arcgis.com/2P6vvDuBXUEzsPyf/arcgis/rest/services/hotel/FeatureServer/0"})
+        .addTo(map).openPopup();
+        L.Control.geocoder().addTo(map);
+    </script>
+  </body>
+</html>
